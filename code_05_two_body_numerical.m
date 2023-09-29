@@ -25,7 +25,7 @@ vpVec = [0, vp, 0].'; % [km/s]
 vaVec = [0, -va, 0].'; % [km/s]
 
 % propagation duration
-% tspan = [0, 3] * 3600; % [s]
+tspan = [0, 3] * 3600; % [s]
 % tspan = [0, 1.132] * 3600; % [s] % this leads to ~120 deg.
 % tspan = [0, TTWithEvent(end)]; % [s] % this leads to more accurate 120 deg. (Must be called after getting `TTWithEvent`.)
 
