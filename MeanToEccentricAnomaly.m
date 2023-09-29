@@ -54,7 +54,7 @@ end
 %% the choice of the initial value matters a lot (handle both elliptic and hyperbolic orbits)
 if ecc < 1 % elliptic
     
-    default in Curtis2020 Algorithm 3.1
+    % default in Curtis2020 Algorithm 3.1
     if meanAnomaly < pi
         eccentricAnomaly_0 = meanAnomaly + ecc / 2;
     else
