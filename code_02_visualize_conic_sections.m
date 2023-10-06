@@ -49,7 +49,7 @@ end
 
 
 %% do the actual plotting
-figure(33); % initialize a figure window numbered 33
+figure(23); % initialize a figure window numbered 33
 clf; % clear the figure
 
 % plot cone

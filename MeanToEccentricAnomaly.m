@@ -66,7 +66,7 @@ if ecc < 1 % elliptic
     % warning('# HP: naive initial values are used.')
 
     % % a even more naive choice of using just 0
-    % eccentricAnomaly_0 = 0; % this leads to even more iterations, and even diverge.
+    % eccentricAnomaly_0 = 1; % this leads to even more iterations, and even diverge.
     % warning('# HP: naive initial values are used.')
 
 else % hyperbolic
@@ -122,7 +122,11 @@ end
 eccentricAnomaly = eccentricAnomaly_0;
 if nargout == 2
     info.M = meanAnomaly;
-    info.E = eccentricAnomaly;
+    if ecc < 1
+        info.E = eccentricAnomaly;
+    else
+        info.F = eccentricAnomaly;
+    end
     info.tol = tol;
     info.steps = iiStep;
     info.diffLastStep = diff; % [rad]

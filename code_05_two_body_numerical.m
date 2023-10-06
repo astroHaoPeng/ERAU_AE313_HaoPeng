@@ -18,16 +18,21 @@ epsilon = - muEarth / 2 / a; % [km^2/s^2]
 vp = sqrt( 2 * (epsilon + muEarth / rp ) ); % [km/s]
 va = sqrt( 2 * (epsilon + muEarth / ra ) ); % [km/s]
 
-%% numerical integration for a give time interval
+
+
+
+%% 01. numerical integration for a give time interval
 rpVec = [rp, 0, 0].'; % [km]
-raVec = [ra, 0, 0].'; % [km]
+% raVec = [ra, 0, 0].'; % [km]
 vpVec = [0, vp, 0].'; % [km/s]
-vaVec = [0, -va, 0].'; % [km/s]
+% vaVec = [0, -va, 0].'; % [km/s]
+% the eccentricity vector
+eVec = cross(vpVec, cross(rpVec, vpVec)) / muEarth - rpVec / norm(rpVec);
 
 % propagation duration
-tspan = [0, 3] * 3600; % [s]
-% tspan = [0, 1.132] * 3600; % [s] % this leads to ~120 deg.
-% tspan = [0, TTWithEvent(end)]; % [s] % this leads to more accurate 120 deg. (Must be called after getting `TTWithEvent`.)
+% tspan = [0, 3] * 3600; % [s]
+tspan = [0, 1.132] * 3600; % [s] % this leads to ~120 deg.
+% tspan = [0, 4077.04]; % [s] % this leads to ~120 deg.
 
 % initial value
 X0 = [rpVec; vpVec]; % semi-colon connects vertically
@@ -38,30 +43,24 @@ options = odeset('RelTol',1e-6, 'AbsTol',1e-6, 'Stats','on'); % try lower the ac
 % call ode45
 [TT, XX] = ode45(@(t,X)OdeTwoBody(muEarth, X), tspan, X0, options);
 
-%% calculate true anomaly at the end directly
-% restore to r, v vectors
+% calculate true anomaly at the end directly
 rEndVec = XX(end, 1:3).';
 vEndVec = XX(end, 4:6).';
-% unit vector of apex line, also the eccentricity vector direction
-iHatVec = [1, 0, 0];
-% using dot-product to get the true anomlay
-thetaEnd = acos(dot(rEndVec, iHatVec) / norm(rEndVec));
-% test whether in upper or lower half of the ellipse
-if dot(rEndVec, vEndVec) < 0
-    thetaEnd = 2*pi - thetaEnd; % adjust if in the lower half
-end
+thetaEnd = CalculateTrueAnomaly(rEndVec, vEndVec, eVec);
 % display results
 num2str(rad2deg(thetaEnd), '%.2f')
 fprintf('# HP: the final true anomaly is %.2f deg.\n', thetaEnd);
 
-%% visualize the trajectory
-figure(33);
+% %% visualize the trajectory
+figure(53);
 clf;
 plot(XX(:,1), XX(:,2), 'r.-')
 hold on;
-% entire orbit
-[tmpTT, tmpXX] = ode45(@(t,X)OdeTwoBody(muEarth, X), [0,2*pi/sqrt(muEarth)*a^(3/2)], X0, options);
-plot(tmpXX(:,1), tmpXX(:,2), ':k')
+% entire elliptic orbit
+if ecc < 1
+    [tmpTT, tmpXX] = ode45(@(t,X)OdeTwoBody(muEarth, X), [0,2*pi/sqrt(muEarth)*a^(3/2)], X0, options);
+    plot(tmpXX(:,1), tmpXX(:,2), ':k')
+end
 % focus
 plot(0, 0, 'rx', 'MarkerSize',15)
 % rEnd
@@ -80,13 +79,13 @@ text(tmpCosA(tmpN), tmpSinA(tmpN), {tmpString2, tmpString1}, 'HorizontalAlignmen
 %
 axis equal;
 grid on;
-title(['$e=$ ' num2str(ecc, '%.8f')], 'Interpreter','latex')
+title(['$e=$ ' num2str(ecc, '%.8f') '; only \texttt{tspan} used for \texttt{ode45}.'], 'Interpreter','latex')
 
 
 
 
 
-%% numerical integration with an event to stop at precisely a given true anomaly
+%% 02. numerical integration with an event to stop at precisely a given true anomaly
 
 % desired true anomaly
 trueAnomalyDesired = deg2rad(120); % [rad]
@@ -95,15 +94,27 @@ trueAnomalyDesired = deg2rad(120); % [rad]
 period = 2*pi/sqrt(muEarth)*a^(3/2); % [s]
 tspan = [0, 1] * period; % [s]
 
+% initial value
+X0 = [rpVec; vpVec]; % semi-colon connects vertically
+
 % integration options, control the accuracy and outputs
 %   an `event` handle is added now
-optionsWithEvent = odeset('RelTol',1e-6, 'AbsTol',1e-6, 'Stats','on', 'Events',@(a,b)eventExactTrueAnomaly(a,b,trueAnomalyDesired)); % try lower the accuracy and see what happens?
+optionsWithEvent = odeset('RelTol',1e-6, 'AbsTol',1e-6, 'Stats','on', 'Events',@(a,b)OdeEventExactTrueAnomaly(a,b,eVec,trueAnomalyDesired)); % try lower the accuracy and see what happens?
 
 % call ode45
 [TTWithEvent, XXWithEvent] = ode45(@(t,X)OdeTwoBody(muEarth, X), tspan, X0, optionsWithEvent);
 
-%% visualize the trajectory
-figure(34);
+% calculate true anomaly at the end directly
+rWithEventEndVec = XXWithEvent(end, 1:3).';
+vWithEventEndVec = XXWithEvent(end, 4:6).';
+thetaWithEventEnd = CalculateTrueAnomaly(rWithEventEndVec, vWithEventEndVec, eVec);
+% display results
+num2str(rad2deg(thetaWithEventEnd), '%.2f')
+fprintf('# HP: the final true anomaly is %.2f deg.\n', thetaWithEventEnd);
+
+
+% %% visualize the trajectory
+figure(54);
 clf;
 plot(XXWithEvent(:,1), XXWithEvent(:,2), 'r.-')
 hold on;
@@ -122,47 +133,77 @@ tmpAngles = linspace(0, trueAnomalyDesired, 2*tmpN+1);
 tmpCosA = 0.2*rp*cos(tmpAngles);
 tmpSinA = 0.2*rp*sin(tmpAngles);
 plot(tmpCosA, tmpSinA, 'b-');
-tmpString1 = ['\theta = ' num2str(rad2deg(trueAnomalyDesired), '%.2f') ' deg'];
-tmpString2 = ['t = ' num2str(TTWithEvent(end), '%.2f') ' s'];
-text(tmpCosA(tmpN), tmpSinA(tmpN), {tmpString2, tmpString1}, 'HorizontalAlignment','left', 'VerticalAlignment','bottom')
+tmpString1 = ['\theta_{\rm desired} = ' num2str(rad2deg(trueAnomalyDesired), '%.2f') ' deg'];
+tmpString2 = ['\theta_{\rm integrated} = ' num2str(rad2deg(thetaWithEventEnd), '%.2f') ' deg'];
+tmpString3 = ['t = ' num2str(TTWithEvent(end), '%.2f') ' s'];
+text(tmpCosA(tmpN), tmpSinA(tmpN), {tmpString3, tmpString2, tmpString1}, 'HorizontalAlignment','left', 'VerticalAlignment','bottom')
 %
 axis equal;
 grid on;
-title(['$e=$ ' num2str(ecc, '%.8f')], 'Interpreter','latex')
+title(['$e=$ ' num2str(ecc, '%.8f') '; \texttt{tspan} and \texttt{event} used for \texttt{ode45}.'], 'Interpreter','latex')
 
 
 
 
 
-%% private functions
-function dXdt = OdeTwoBody(muEarth, X)
+%% 03. numerical integration with an event to stop at the next periapsis or apoapsis
 
-r = X(1:3);
-v = X(4:6);
+% pick a random initial condition from the previously integrated trajectory
+idRandom = randi(size(XXWithEvent, 1));
+t0 = TTWithEvent(idRandom);
+X0 = XXWithEvent(idRandom, :);
 
-drdt = v;
+% desired true anomaly
+% styApsisType = 'periapsis';
+styApsisType = 'apoapsis';
 
-rCube = (sum(r.^2)).^(3/2);
-dvdt = - muEarth / rCube * r;
+% large enough time interval
+period = 2*pi/sqrt(muEarth)*a^(3/2); % [s]
+tspan = [t0, 2*period]; % [s]
 
-dXdt = [drdt(:); dvdt(:)]; % trick: A(:) will change any vector to a column vector, equivalent to `reshape(A, [], 1)`.
-end
+% integration options, control the accuracy and outputs
+%   an `event` handle is added now
+optionsWithEvent = odeset('RelTol',1e-6, 'AbsTol',1e-6, 'Stats','on', 'Events',@(a,b)OdeEventApsis(a,b,styApsisType));
+
+% call ode45
+[TTWithEventApsis, XXWithEventApsis] = ode45(@(t,X)OdeTwoBody(muEarth, X), tspan, X0, optionsWithEvent);
+
+% calculate true anomaly at the end directly
+rWithEventEndVec = XXWithEventApsis(end, 1:3).';
+vWithEventEndVec = XXWithEventApsis(end, 4:6).';
+thetaWithEventApsisEnd = CalculateTrueAnomaly(rWithEventEndVec, vWithEventEndVec, eVec);
+% display results
+num2str(rad2deg(thetaWithEventApsisEnd), '%.2f')
+fprintf('# HP: the final true anomaly is %.2f deg.\n', thetaWithEventApsisEnd);
 
 
-function [value,isterminal,direction] = eventExactTrueAnomaly(t, X, trueAnomalyDesired)
-% restore to r, v vectors
-rVec = X(1:3).';
-vVec = X(4:6).';
-% unit vector of apex line, also the eccentricity vector direction
-iHatVec = [1, 0, 0];
-% using dot-product to get the true anomlay
-thetaEnd = acos(dot(rVec, iHatVec) / norm(rVec));
-% test whether in upper or lower half of the ellipse
-if dot(rVec, vVec) < 0
-    thetaEnd = 2*pi - thetaEnd; % adjust if in the lower half
-end
-% outputs
-value = thetaEnd - trueAnomalyDesired;
-isterminal = 1;
-direction = 0;
-end
+% %% visualize the trajectory
+figure(55);
+clf;
+plot(XXWithEventApsis(:,1), XXWithEventApsis(:,2), 'r.-')
+hold on;
+% entire orbit
+[tmpTT, tmpXX] = ode45(@(t,X)OdeTwoBody(muEarth, X), [0,2*pi/sqrt(muEarth)*a^(3/2)], X0, options);
+plot(tmpXX(:,1), tmpXX(:,2), ':k')
+% focus
+plot(0, 0, 'rx', 'MarkerSize',15)
+% rEnd
+plot([0, XXWithEventApsis(end, 1)], [0, XXWithEventApsis(end, 2)], 'b-');
+% rBegin
+plot([0, X0(1)], [0, X0(2)], 'b-');
+% angle
+tmpN = 10;
+thetaBegin = CalculateTrueAnomaly(X0(1:3), X0(4:6), eVec);
+tmpAngles = linspace(thetaBegin, thetaWithEventApsisEnd, 2*tmpN+1);
+tmpCosA = 0.2*rp*cos(tmpAngles);
+tmpSinA = 0.2*rp*sin(tmpAngles);
+plot(tmpCosA, tmpSinA, 'b-');
+tmpString2 = ['\Delta \theta_{\rm integrated} = ' num2str(rad2deg(thetaWithEventApsisEnd - thetaBegin), '%.2f') ' deg'];
+tmpString3 = ['\Delta t = ' num2str(TTWithEventApsis(end) - t0, '%.2f') ' s'];
+text(tmpCosA(tmpN), tmpSinA(tmpN), {tmpString3, tmpString2}, 'HorizontalAlignment','left', 'VerticalAlignment','bottom')
+%
+axis equal;
+grid on;
+title(['$e=$ ' num2str(ecc, '%.4f') '; \texttt{tspan} and ' styApsisType ' \texttt{event} used for \texttt{ode45}.'], 'Interpreter','latex')
+
+

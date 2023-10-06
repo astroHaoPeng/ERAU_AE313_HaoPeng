@@ -1,14 +1,9 @@
 %% Solve Kepler's equation using Newton's method in textbook
 
-% elliptic
-ecc = 10.95;
+% hyperbolic
+ecc = 5;
 tol = 1e-8;
-meanAnomlayListDeg = 0 : 0.1 : 360;
-
-% % hyperbolic
-% ecc = 5;
-% tol = 1e-8;
-% meanAnomlayListDeg = -1e4 : 1 : 1e4;
+meanAnomlayListDeg = -1e4 : 1 : 1e4;
 
 %% solve
 tmp = zeros(length(meanAnomlayListDeg), 3);
@@ -18,11 +13,7 @@ for ii = 1 : length(meanAnomlayListDeg)
     tmp(ii, 1) = info.steps;
     tmp(ii, 2) = info.diffLastStep;
     tmp(ii, 3) = info.errorKeplersEquation;
-    if ecc < 1
-        tmp(ii, 4) = info.E;
-    elseif ecc > 1
-        tmp(ii, 4) = info.F;
-    end
+    tmp(ii, 4) = info.F;
 end
 
 %% visualize results
