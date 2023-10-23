@@ -58,11 +58,16 @@ rotationMatrix2D = [
     cos(angle), -sin(angle)
     sin(angle),  cos(angle)];
 
-tmpIds = setdiff([1, 2, 3], idAxis);
-
 rotationMatrix3D = eye(3);
+switch idAxis
+    case 1
+        tmpIds = [2, 3];
+    case 2
+        tmpIds = [3, 1];
+    case 3
+        tmpIds = [1, 2];
+end
 rotationMatrix3D(tmpIds, tmpIds) = rotationMatrix2D;
-
 end
 
 
