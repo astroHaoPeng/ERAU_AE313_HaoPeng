@@ -1,4 +1,4 @@
-function [rVecECI, vVecECI] = CoeToRv(coe)
+function [rVecECI, vVecECI] = ConvertCoeToRv(coe)
 %% convert ECI coordinates to classical orbital elements.
 %
 % Inputs:
