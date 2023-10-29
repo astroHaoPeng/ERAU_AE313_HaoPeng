@@ -3,7 +3,7 @@
 % Method-1: Solve the problem by 
 %   1. converting ECI RV to COE;
 %   2. using time t and true anomaly conversion to add additional duration;
-%   3. converting back to a new set of COE (only true anomaly is differetn);
+%   3. converting back to a new set of COE (only true anomaly is different);
 %   4. converting COE to ECI RV.
 %
 % Method-2: Numerical propagation using ode45
@@ -14,7 +14,7 @@ muEarth = 398600; % [km^3/s^2]
 
 r1 = [-5000 -8000 -2100].'; % [km/s]
 v1 = [-4 3.5 -3].'; % [km/s]
-dt = 50 * 60; % [s]
+dt = 50 * 60 * 1; % [s]
 
 timer1 = tic;
 
