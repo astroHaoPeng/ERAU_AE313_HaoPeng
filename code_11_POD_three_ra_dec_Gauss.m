@@ -37,9 +37,10 @@ sitePositionVecECI1 = (rEarth + height) * [cos(latitude)*cos(thetaLst(1)), cos(l
 sitePositionVecECI2 = (rEarth + height) * [cos(latitude)*cos(thetaLst(2)), cos(latitude)*sin(thetaLst(2)), sin(latitude)].';
 sitePositionVecECI3 = (rEarth + height) * [cos(latitude)*cos(thetaLst(3)), cos(latitude)*sin(thetaLst(3)), sin(latitude)].';
 
-sitePositionVecECI1 = [3489.8, 3430.2, 4078.5].';
-sitePositionVecECI2 = [3460.1, 3460.1, 4078.5].';
-sitePositionVecECI3 = [3429.9, 3490.1, 4078.5].';
+% debugging data, copied from Curtis2020 example 5.11
+% sitePositionVecECI1 = [3489.8, 3430.2, 4078.5].';
+% sitePositionVecECI2 = [3460.1, 3460.1, 4078.5].';
+% sitePositionVecECI3 = [3429.9, 3490.1, 4078.5].';
 
 
 matrixR = [sitePositionVecECI1, sitePositionVecECI2, sitePositionVecECI3];
@@ -114,27 +115,47 @@ r1VecECIIter = r1VecECI;
 r2VecECIIter = r2VecECI;
 r3VecECIIter = r3VecECI;
 v2VecECIIter = v2VecECI_from_both;
+kk = 0;
 while true
     % calculate true anomalies at t1 and t2
     hIter = oe2Iter(1);
     eIter = oe2Iter(2);
-    aIter = hIter^2 / muEarth / (1-eIter^2);
-    meanMotion = sqrt(muEarth) / aIter^(3/2);
-    trueAnomaly2 = oe2Iter(3);
-    eccentricAnomaly2 = 2 * atan( sqrt((1-eIter)/(1+eIter)) * tan(trueAnomaly2/2) );
-    meanAnomaly2 = eccentricAnomaly2 - eIter * sin(eccentricAnomaly2);
-    timeSincePerigee2 = meanAnomaly2 / meanMotion;
+    if eIter < 1 % elliptical orbits
+        aIter = hIter^2 / muEarth / (1-eIter^2);
+        meanMotion = sqrt(muEarth) / aIter^(3/2);
+        trueAnomaly2 = oe2Iter(3);
+        eccentricAnomaly2 = 2 * atan( sqrt((1-eIter)/(1+eIter)) * tan(trueAnomaly2/2) );
+        meanAnomaly2 = eccentricAnomaly2 - eIter * sin(eccentricAnomaly2);
+        timeSincePerigee2 = meanAnomaly2 / meanMotion;
+    else % hyperbolic orbits
+        trueAnomaly2 = oe2Iter(3);
+        eccentricAnomaly2 = 2 * atanh( sqrt((eIter-1)/(eIter+1)) * tan(trueAnomaly2/2) );
+        meanAnomaly2 = eIter * sinh(eccentricAnomaly2) - eccentricAnomaly2;
+        timeSincePerigee2 = meanAnomaly2 / (muEarth^2/hIter^3*(eIter^2-1)^(3/2));
+    end
     %
     timeSincePerigee1 = timeSincePerigee2 + tau1;
-    meanAnomaly1 = meanMotion * timeSincePerigee1;
-    eccentricAnomaly1 = MeanToEccentricAnomaly(eIter, meanAnomaly1);
-    trueAnomaly1 = 2 * atan( sqrt((1+eIter)/(1-eIter)) * tan(eccentricAnomaly1/2) );
+    if eIter < 1
+        meanAnomaly1 = meanMotion * timeSincePerigee1;
+        eccentricAnomaly1 = MeanToEccentricAnomaly(eIter, meanAnomaly1);
+        trueAnomaly1 = 2 * atan( sqrt((1+eIter)/(1-eIter)) * tan(eccentricAnomaly1/2) );
+    else
+        meanAnomaly1 = (muEarth^2/hIter^3*(eIter^2-1)^(3/2)) * timeSincePerigee1;
+        eccentricAnomaly1 = MeanToEccentricAnomaly(eIter, meanAnomaly1);
+        trueAnomaly1 = 2 * atan( sqrt((eIter+1)/(eIter-1)) * tanh(eccentricAnomaly1/2) );
+    end
     oe1Iter = [oe2Iter(1:2), trueAnomaly1, oe2Iter(4:6)];
     %
     timeSincePerigee3 = timeSincePerigee2 + tau3;
-    meanAnomaly3 = meanMotion * timeSincePerigee3;
-    eccentricAnomaly3 = MeanToEccentricAnomaly(eIter, meanAnomaly3);
-    trueAnomaly3 = 2 * atan( sqrt((1+eIter)/(1-eIter)) * tan(eccentricAnomaly3/2) );
+    if eIter < 1
+        meanAnomaly3 = meanMotion * timeSincePerigee3;
+        eccentricAnomaly3 = MeanToEccentricAnomaly(eIter, meanAnomaly3);
+        trueAnomaly3 = 2 * atan( sqrt((1+eIter)/(1-eIter)) * tan(eccentricAnomaly3/2) );
+    else
+        meanAnomaly3 = (muEarth^2/hIter^3*(eIter^2-1)^(3/2)) * timeSincePerigee3;
+        eccentricAnomaly3 = MeanToEccentricAnomaly(eIter, meanAnomaly3);
+        trueAnomaly3 = 2 * atan( sqrt((eIter+1)/(eIter-1)) * tanh(eccentricAnomaly3/2) );
+    end
     oe3Iter = [oe2Iter(1:2), trueAnomaly3, oe2Iter(4:6)];
 
     % calculate f1, g1, f3, g3 using expressions of deltaTheta
@@ -179,6 +200,7 @@ while true
 
     % disp('# Hao: true anomalies:')
     % disp([trueAnomaly1, trueAnomaly2, trueAnomaly3])
+    fprintf('# Hao: ~~~~~~~~~~ Iter-%d ~~~~~~~~~~\n', kk)
     fprintf('# Hao: rho comparison (km):\n')
     fprintf('# Hao:   before   %15.6e, %15.6e, %15.6e\n', rho1, rho2, rho3);
     fprintf('# Hao:   now      %15.6e, %15.6e, %15.6e\n', rho1Iter, rho2Iter, rho3Iter);
@@ -194,9 +216,18 @@ while true
         tmp(1), tmp(2), tmp(3), tmp(4), tmp(5), tmp(6));
     
     if max(abs(oe2Iter - oe2IterNext)) < 1
-        disp('# Hao: Done!')
+        disp('# Hao: Iteration correction done!')
+        % display refined results
+        disp(['# ------------ After ' num2str(kk) ' iterations -------------------------'])
+        disp(['# Hao: ECI position         = [' num2str(r2VecECI.', '%+15.6e') '] km'])
+        disp(['# Hao: ECI position refined = [' num2str(r2VecECIIter.', '%+15.6e') '] km/s'])
+        disp(['# Hao: ECI velocity         = [' num2str(v2VecECI_from_both.', '%+15.6e') '] km/s'])
+        disp(['# Hao: ECI velocity refined = [' num2str(v2VecECIIter.', '%+15.6e') '] km/s'])
+        toc;
         break
     else
         oe2Iter = oe2IterNext;
+        kk = kk + 1;
     end
+
 end

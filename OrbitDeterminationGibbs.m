@@ -24,8 +24,10 @@ r3Norm = sum(r3Vec.^2)^(1/2);
 D = cross(r1Vec, r2Vec) + cross(r2Vec, r3Vec) + cross(r3Vec, r1Vec);
 N = r1Norm * cross(r2Vec, r3Vec) + r2Norm * cross(r3Vec, r1Vec) + r3Norm * cross(r1Vec, r2Vec);
 S = (r2Norm - r3Norm) * r1Vec + (r3Norm - r1Norm) * r2Vec + (r1Norm - r2Norm) * r3Vec;
-if norm(cross(D, N)) > 1e-5
-    warning('# Hao: dot(D, N) = %.5e > 1e-5, Gibbs method may not function properly!', norm(cross(D, N)))
+
+tmp = norm(cross(D/norm(D), N/norm(N)));
+if tmp > 1e-2
+    warning('# Hao: D/|D| X N/|N|) = %.5e > 1e-2, not quite coplannar, so Gibbs method may not function properly!', tmp)
 end
 
 DNorm = sum(D.^2)^(1/2);
