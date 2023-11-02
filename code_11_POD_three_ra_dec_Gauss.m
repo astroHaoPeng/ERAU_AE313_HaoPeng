@@ -100,6 +100,7 @@ toc;
 
 
 %% an example of iteration
+flagIteration = false;
 typeIteration = 'default';
 % typeIteration = 'Gibbs';
 if strcmpi(typeIteration, 'Gibbs')
@@ -116,7 +117,7 @@ r2VecECIIter = r2VecECI;
 r3VecECIIter = r3VecECI;
 v2VecECIIter = v2VecECI_from_both;
 kk = 0;
-while true
+while flagIteration
     % calculate true anomalies at t1 and t2
     hIter = oe2Iter(1);
     eIter = oe2Iter(2);
