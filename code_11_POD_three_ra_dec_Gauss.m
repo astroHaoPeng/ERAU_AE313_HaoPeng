@@ -12,7 +12,7 @@ muEarth = 398600; % [km^3/s^2]
 rEarth = 6378; % [km]
 omegaEarth = deg2rad(360) / 86164.0905; % Earth rotation rate [rad/s] (note: must using sidereal time of a day)
 
-% radar station site parameters
+% optical station site parameters
 latitude = deg2rad(40.0); % latitude [rad]
 height = 1.0; % altitude [km] % use `height` to avoid potentail typo or ambiguity with `latitude`
 
