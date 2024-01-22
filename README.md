@@ -2,7 +2,9 @@
 
 Codes for AE 313 Fall 2023.
 
-`git` is a program to help do file versioning.
+Check our Canvas page for other learning materials.
+
+`git` is a program to help do code/file versioning.
 
 All committed changes to the codes here can be traced in commit history.
 
