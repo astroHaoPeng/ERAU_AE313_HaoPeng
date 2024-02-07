@@ -24,7 +24,7 @@ planePoint = [3 0 3].';
 plotRegion = [-10, 10, -10, 10, -10, 10];
 
 % Use a boolean flag to choose how to define functions, in a vectorized way (better performance) or an intuitive way (slower)
-flagVectorizedDefinition = false; 
+flagVectorizedDefinition = true; 
 
 % Set partial function definitions
 %   Here @ is used to define a partial function (fewer inputs) from an original function (more inputs).
