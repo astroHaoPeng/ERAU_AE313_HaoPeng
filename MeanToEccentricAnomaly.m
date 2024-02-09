@@ -61,11 +61,11 @@ if ecc < 1 % elliptic
         eccentricAnomaly_0 = meanAnomaly - ecc / 2;
     end
 
-    % % a naive choice using just the input mean anomaly
+    % a naive choice using just the input mean anomaly
     % eccentricAnomaly_0 = meanAnomaly; % this leads to more iterations
     % warning('# HP: naive initial values are used.')
 
-    % % a even more naive choice of using just 0
+    % a even more naive choice of using just 0
     % eccentricAnomaly_0 = 1; % this leads to even more iterations, and even diverge.
     % warning('# HP: naive initial values are used.')
 
@@ -93,7 +93,7 @@ while ~flagDone
     end
     % verbose: print each iteration
     if strcmpi(typeVerbose, 'step')
-        fprintf('# HP: step-%05d | E0 = %13.9f deg | E1 = %13.9f deg | diff = %13.9e deg \n', ...
+        fprintf('# HP: step-%05d | E0 = %13.6e deg | E1 = %13.6e deg | diff = %13.6e deg \n', ...
             iiStep, rad2deg(eccentricAnomaly_0), rad2deg(eccentricAnomaly_1), rad2deg(eccentricAnomaly_1 - eccentricAnomaly_0));
     end
     % update values for the next step
