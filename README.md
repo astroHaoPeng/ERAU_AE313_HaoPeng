@@ -10,6 +10,15 @@ All committed changes to the codes here can be traced in commit history.
 
 # Git tutorials
 
+
+Start with this "What is Git" page: 
+https://nulab.com/learn/software-development/git-tutorial/git-basics/what-is-git/
+
+Then, continue with other topics: 
 https://nulab.com/learn/software-development/git-tutorial/
 
-https://nulab.com/learn/software-development/git-tutorial/git-basics/what-is-git/
+
+## ALPENGLOW Lab resource
+
+This is a private Git guide for students in my lab: 
+https://alpenglow.space/kb/pvt-lab-tutorials/git
