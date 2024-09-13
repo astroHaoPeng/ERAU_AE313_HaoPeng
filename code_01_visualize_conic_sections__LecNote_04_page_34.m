@@ -1,6 +1,6 @@
 % Visualize the intersection between a cone and a plane, which gives generic conic sections.
 %
-%   - the algorithm is given on page 30 of LecNote_04.
+%   - the algorithm is given on page 33 of LecNote_04.
 %   - vector doc product is used to define cone and plane
 %   - the algorithm can be further improved.
 %
@@ -12,7 +12,7 @@ coneApexAngle = deg2rad(42);
 coneApexLocation = [0 0 0].';
 
 %% parameters for the plane
-planeNormalVector = [0 0 15].'; % circle
+% planeNormalVector = [0 0 15].'; % circle
 % planeNormalVector = [5 0 15].'; % ellipse
 % planeNormalVector = [5 0 1].'; % hyperbola
 % planeNormalVector = [0 -cos(coneApexAngle) sin(coneApexAngle)].'; % parabola, must holds an angle of `coneApexAngle` w.r.t. `coneOrientationDirection`
@@ -38,12 +38,12 @@ clf; % clear the figure
 
 % plot cone
 fimplicit3(funConeToPlot, plotRegion, ...
-    'MeshDensity',50, 'EdgeColor','none', 'FaceAlpha',0.3, 'FaceColor','c');
+    'MeshDensity',50, 'EdgeColor','none', 'FaceAlpha',0.4, 'FaceColor','c');
 hold on; % hold the plotted surface, otherwise it will be overwritten
 
 % plot plane
 fimplicit3(funPlaneToPlot, plotRegion, ...
-    'EdgeColor','none', 'FaceAlpha',0.4, 'FaceColor','r');
+    'EdgeColor','none', 'FaceAlpha',0.3, 'FaceColor','r');
 
 % plot the normal vector
 tmpVec = [planePoint, planePoint + planeNormalDirection * max(plotRegion)/3];

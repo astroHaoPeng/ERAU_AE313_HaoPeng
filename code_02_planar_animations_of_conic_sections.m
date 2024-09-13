@@ -133,6 +133,7 @@ for ii = 1:N
     end
     plot(xx(ii), yy(ii), 'ro', 'MarkerFaceColor','r', 'MarkerSize',ms); % m2 point
     plot([0 xx(ii)], [0, yy(ii)], 'r-', 'LineWidth',lw) % position vector
+    % axis equal; % commenting this out causes visual illusion that periapsis is not the closest point
     
     % save current frame
     GifData = getframe(gcf);
@@ -189,7 +190,7 @@ for ii = 1:length(xx)
     end
     plot(xx(ii), yy(ii), 'ro', 'MarkerFaceColor','r', 'MarkerSize',ms); % m2 point
     plot([0 xx(ii)], [0, yy(ii)], 'r-', 'LineWidth',lw) % position vector
-    % axis equal;
+    % axis equal; % commenting this out causes visual illusion that periapsis is not the closest point
     
     % save current frame
     GifData = getframe(gcf);
