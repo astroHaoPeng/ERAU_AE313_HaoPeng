@@ -63,11 +63,11 @@ if ecc < 1 % elliptic
 
     % a naive choice using just the input mean anomaly
     % eccentricAnomaly_0 = meanAnomaly; % this leads to more iterations
-    % warning('# HP: naive initial values are used.')
+    % warning('# HP: mean anomaly is used as initial guess.')
 
     % a even more naive choice of using just 0
-    % eccentricAnomaly_0 = 1; % this leads to even more iterations, and even diverge.
-    % warning('# HP: naive initial values are used.')
+    % eccentricAnomaly_0 = 0; % this leads to even more iterations, and even diverge.
+    % warning('# HP: naive initial guess is used, always 0.')
 
 else % hyperbolic
 
