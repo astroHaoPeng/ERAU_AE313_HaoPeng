@@ -4,8 +4,8 @@ function [eccentricAnomaly, info] = MeanToEccentricAnomaly(ecc, meanAnomaly, typ
 % Inputs:
 %   ecc: eccentricity in (0, 1)
 %   meanAnomaly: [rad] mean anomaly
-%   verbose: control displayment of iterations, 'none' (default), 'step', or 'final'.
-%   tol: convergence tolerance (default: 1e-8 rad)
+%   typeVerbose: control displayment of iterations, 'none' (default), 'step', or 'final'.
+%   tol: convergence tolerance (default: 1e-10 rad)
 %
 % Outputs:
 %   eccentricAnomaly: eccentric anomaly [rad]
