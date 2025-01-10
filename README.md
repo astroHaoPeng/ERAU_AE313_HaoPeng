@@ -1,6 +1,6 @@
 # ERAU_AE313_HaoPeng
 
-Codes for AE 313 Fall 2024.
+Codes for AE 313 Spring 2025.
 
 Check our Canvas page for other learning materials.
 
