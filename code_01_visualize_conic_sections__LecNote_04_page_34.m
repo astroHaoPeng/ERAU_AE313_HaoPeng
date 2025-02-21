@@ -1,6 +1,6 @@
 % Visualize the intersection between a cone and a plane, which gives generic conic sections.
 %
-%   - the algorithm is given on page 33 of LecNote_04.
+%   - the algorithm is given on page 53 of LecNote_04.
 %   - vector doc product is used to define cone and plane
 %   - the algorithm can be further improved.
 %
