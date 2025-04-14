@@ -35,6 +35,10 @@ switch strType
         value = tmp;
         isterminal = 1;
         direction = -1;
+    case 'both'
+        value = tmp;
+        isterminal = 1;
+        direction = 0;
 end
 
 
