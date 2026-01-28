@@ -1,6 +1,6 @@
 # ERAU_AE313_HaoPeng
 
-Codes for AE 313 Spring 2025.
+Codes for AE 313 Spring 2026.
 
 Check our Canvas page for other learning materials.
 
@@ -20,5 +20,5 @@ https://nulab.com/learn/software-development/git-tutorial/
 
 ## ALPENGLOW Lab resource
 
-This is a private Git guide for students in my lab: 
-https://alpenglow.space/kb/pvt-lab-tutorials/git
+This is a quick Git guide for students in ALPENGLOW Lab: 
+https://alpenglow.space/kb/lab-tutorials/git
