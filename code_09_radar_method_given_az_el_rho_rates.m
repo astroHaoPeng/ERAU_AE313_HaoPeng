@@ -99,6 +99,7 @@ fprintf('#        theta = %.10f [rad] = %.10f [deg]\n', oe_(3), rad2deg(oe_(3)))
 fprintf('#         RAAN = %.10f [rad] = %.10f [deg]\n', oe_(4), rad2deg(oe_(4)))
 fprintf('#  inclination = %.10f [rad] = %.10f [deg]\n', oe_(5), rad2deg(oe_(5)))
 fprintf('#           AP = %.10f [rad] = %.10f [deg]\n', oe_(6), rad2deg(oe_(6)))
+fprintf('#----------------------------------------------------------\n')
 end
 
 
